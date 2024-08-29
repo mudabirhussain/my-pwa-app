@@ -46,7 +46,9 @@ const TranscriptionBox: React.FC = () => {
       const formData = new FormData();
       formData.append("file", audioBlob, "audio.wav");
 
-      fetch("http://localhost:8080/ai/transcription", {
+      const openAITransUrl = `${import.meta.env.VITE_RELIFE_BACKEND_URL}/ai/transcription`;
+
+      fetch(openAITransUrl, {
         method: "POST",
         body: formData,
       })

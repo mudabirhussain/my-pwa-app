@@ -68,8 +68,8 @@ const HomePage: React.FC = () => {
       </Stack>
       
       <Box mt={10} color="gray.500">
-        © 2024 ReLife. All rights reserved.
-      </Box>
+        Stripe & AI Tools Integration Task | Mudabir Hussain - Software Engineer
+        </Box>
     </Box>
   );
 };

@@ -5,9 +5,11 @@ const ChatBox: React.FC = () => {
   const [input, setInput] = useState("");
   const [chatHistory, setChatHistory] = useState<string[]>([]);
 
+  const openAIChatUrl = `${import.meta.env.VITE_RELIFE_BACKEND_URL}/ai/chat`;
+
   const handleSend = () => {
     if (input.trim()) {
-      fetch("http://localhost:8080/ai/chat", {
+      fetch(openAIChatUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

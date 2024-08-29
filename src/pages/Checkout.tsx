@@ -51,8 +51,9 @@ const Checkout: React.FC = () => {
     setLoading(true);
     setError(null);
 
+    const stripeIntentUrl = `${import.meta.env.VITE_RELIFE_BACKEND_URL}/payment/stripe/intent`;
     try {
-      const response = await fetch("http://localhost:8080/payment/stripe/intent", {
+      const response = await fetch(stripeIntentUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

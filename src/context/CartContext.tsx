@@ -51,8 +51,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       mode: "STRIPE",
     };
 
+    const stripeCheckoutUrl = `${import.meta.env.VITE_RELIFE_BACKEND_URL}/payment/stripe/checkout/hosted`;
+
     try {
-      const response = await fetch("http://localhost:8080/payment/stripe/checkout/hosted", {
+      const response = await fetch(stripeCheckoutUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -7,9 +7,11 @@ const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchAllProductUrl = `${import.meta.env.VITE_RELIFE_BACKEND_URL}/products/all`;
+  
   useEffect(() => {
     // Fetch products from your backend
-    fetch("http://localhost:8080/products/all")
+    fetch(fetchAllProductUrl)
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);

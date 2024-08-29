@@ -6,9 +6,11 @@ const ImageGenerationBox: React.FC = () => {
   const [history, setHistory] = useState<{ prompt: string; imageUrl: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const openAIGenImgUrl = `${import.meta.env.VITE_RELIFE_BACKEND_URL}/ai/image`;
+
   const handleGenerate = () => {
     setIsLoading(true);
-    fetch("http://localhost:8080/ai/image", {
+    fetch(openAIGenImgUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
