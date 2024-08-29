@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Input, Button, VStack, Image, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Input, Button, VStack, Image, Text, Spinner, HStack, useColorModeValue } from "@chakra-ui/react";
 
 const ImageGenerationBox: React.FC = () => {
   const [prompt, setPrompt] = useState("");
@@ -8,7 +8,7 @@ const ImageGenerationBox: React.FC = () => {
 
   const handleGenerate = () => {
     setIsLoading(true);
-    fetch("http://localhost:8080/api/image-generation", {
+    fetch("http://localhost:8080/ai/image", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -17,7 +17,8 @@ const ImageGenerationBox: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setHistory([{ prompt, imageUrl: data.imageUrl }, ...history]);
+        const imageUrl = data.data[0].url; // Assuming the API response is structured as you've shown
+        setHistory([{ prompt, imageUrl }, ...history]);
         setPrompt("");
         setIsLoading(false);
       })
@@ -41,42 +42,67 @@ const ImageGenerationBox: React.FC = () => {
       textAlign="center"
     >
       <VStack spacing={4}>
-        <Input
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Describe the image you want to generate..."
-          size="lg"
+        <Box
+          w="100%"
+          h="300px"
+          p={4}
           borderRadius="md"
-          bg={inputBg}
-        />
-        <Button
-          onClick={handleGenerate}
-          colorScheme="green"
-          size="lg"
-          width="100%"
-          bg={buttonBg}
-          _hover={{ bg: "green.600" }}
-          isLoading={isLoading}
+          boxShadow="md"
+          overflowY="auto"
+          bg={useColorModeValue("white", "gray.700")}
         >
-          Generate Image
-        </Button>
-        <Box mt={4} width="100%">
-          {history.map((item, index) => (
-            <Box
-              key={index}
-              bg={useColorModeValue("white", "gray.700")}
-              p={4}
-              borderRadius="md"
-              boxShadow="md"
-              mb={4}
-              textAlign="left"
-            >
-              <Text fontWeight="bold">Prompt:</Text>
-              <Text mb={3}>{item.prompt}</Text>
-              {item.imageUrl && <Image src={item.imageUrl} alt="Generated" borderRadius="md" />}
-            </Box>
-          ))}
+          {history.length > 0 ? (
+            history.map((item, index) => (
+              <Box key={index} mb={4}>
+                <HStack justify="flex-start">
+                  <Box
+                    p={3}
+                    borderRadius="md"
+                    bg={useColorModeValue("blue.50", "blue.900")}
+                    color={useColorModeValue("blue.800", "white")}
+                    maxWidth="80%"
+                    wordBreak="break-word"
+                  >
+                    <Text fontWeight="bold">Prompt:</Text>
+                    <Text mb={3}>{item.prompt}</Text>
+                    {isLoading && index === 0 ? (
+                      <Spinner size="lg" color="green.500" />
+                    ) : (
+                      item.imageUrl && (
+                        <Image src={item.imageUrl} alt="Generated" borderRadius="md" mt={2} />
+                      )
+                    )}
+                  </Box>
+                </HStack>
+              </Box>
+            ))
+          ) : (
+            <Text>No images generated yet.</Text>
+          )}
         </Box>
+        <HStack w="100%">
+          <Input
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Describe the image you want to generate..."
+            size="lg"
+            borderRadius="md"
+            bg={inputBg}
+            isDisabled={isLoading}
+          />
+          <Button
+            onClick={handleGenerate}
+            colorScheme="green"
+            size="lg"
+            width="100%"
+            bg={buttonBg}
+            _hover={{ bg: "green.600" }}
+            isLoading={isLoading}
+            loadingText="Generating Image..."
+          >
+            Generate
+          </Button>
+        </HStack>
       </VStack>
     </Box>
   );

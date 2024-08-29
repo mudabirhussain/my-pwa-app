@@ -1,25 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Text, VStack, Spinner, useColorModeValue } from "@chakra-ui/react";
+import { Box, Button, Text, VStack, HStack, Spinner, useColorModeValue } from "@chakra-ui/react";
 
 const TranscriptionBox: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
-  const [transcription, setTranscription] = useState<string | null>(null);
+  const [transcriptionHistory, setTranscriptionHistory] = useState<string[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (mediaRecorder && audioChunks.length > 0) {
-      const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-      const formData = new FormData();
-      formData.append("file", audioBlob, "audio.wav");
-
-      fetch("http://localhost:8080/ai/transcribe", {
-        method: "POST",
-        body: formData,
-      })
-        .then((res) => res.json())
-        .then((data) => setTranscription(data.transcription))
-        .catch((err) => console.error("Failed to transcribe audio:", err));
+      processTranscription();
     }
   }, [audioChunks, mediaRecorder]);
 
@@ -35,7 +26,7 @@ const TranscriptionBox: React.FC = () => {
       };
 
       recorder.onstop = () => {
-        console.log("Recording stopped.");
+        setIsRecording(false);
       };
 
       setIsRecording(true);
@@ -46,22 +37,76 @@ const TranscriptionBox: React.FC = () => {
     if (mediaRecorder) {
       mediaRecorder.stop();
     }
-    setIsRecording(false);
+  };
+
+  const processTranscription = () => {
+    if (audioChunks.length > 0) {
+      setIsProcessing(true);
+      const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+      const formData = new FormData();
+      formData.append("file", audioBlob, "audio.wav");
+
+      fetch("http://localhost:8080/ai/transcription", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setTranscriptionHistory((prevHistory) => [
+            ...prevHistory,
+            data.text,
+          ]);
+          setAudioChunks([]); // Clear chunks after processing
+          setIsProcessing(false);
+        })
+        .catch((err) => {
+          console.error("Failed to transcribe audio:", err);
+          setIsProcessing(false);
+        });
+    }
   };
 
   const recordingBg = useColorModeValue("red.100", "red.900");
+  const chatBg = useColorModeValue("white", "gray.800");
 
   return (
     <Box
       p={5}
       maxWidth="600px"
       mx="auto"
-      bg="gray.50"
+      bg={chatBg}
       borderRadius="md"
       boxShadow="lg"
       textAlign="center"
     >
-      <VStack spacing={6}>
+      <VStack spacing={4} align="stretch">
+        <Box
+          w="100%"
+          h="300px"
+          p={4}
+          borderRadius="md"
+          boxShadow="md"
+          overflowY="auto"
+          bg={chatBg}
+        >
+          {transcriptionHistory.map((msg, index) => (
+            <HStack key={index} justify="flex-start" mb={2}>
+              <Box
+                p={3}
+                borderRadius="md"
+                bg={useColorModeValue("gray.100", "gray.700")}
+                color="gray.800"
+                maxWidth="80%"
+                wordBreak="break-word"
+              >
+                <Text>{msg}</Text>
+              </Box>
+            </HStack>
+          ))}
+          {isProcessing && (
+            <Spinner size="sm" color="blue.500" />
+          )}
+        </Box>
         <Button
           onClick={isRecording ? stopRecording : startRecording}
           colorScheme={isRecording ? "red" : "teal"}
@@ -69,6 +114,8 @@ const TranscriptionBox: React.FC = () => {
           width="100%"
           bg={isRecording ? recordingBg : undefined}
           _hover={{ bg: isRecording ? "red.600" : "teal.600" }}
+          isLoading={isProcessing}
+          loadingText="Processing..."
         >
           {isRecording ? (
             <>
@@ -78,23 +125,6 @@ const TranscriptionBox: React.FC = () => {
             "Start Recording"
           )}
         </Button>
-
-        {transcription && (
-          <Box
-            mt={4}
-            p={4}
-            borderRadius="md"
-            bg="gray.100"
-            boxShadow="md"
-            width="100%"
-            textAlign="left"
-          >
-            <Text fontSize="lg" fontWeight="bold" mb={2}>
-              Transcription:
-            </Text>
-            <Text fontSize="md">{transcription}</Text>
-          </Box>
-        )}
       </VStack>
     </Box>
   );

@@ -12,12 +12,13 @@ const ChatBox: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt: input }),
+        body: JSON.stringify({ question: input }), // The request body should match your backend's expected format
       })
         .then((res) => res.json())
         .then((data) => {
-          setChatHistory([...chatHistory, `You: ${input}`, `AI: ${data.response}`]);
-          setInput("");
+          const aiResponse = data.choices[0].message.content; // Extract the AI response
+          setChatHistory([...chatHistory, `You: ${input}`, `AI: ${aiResponse}`]); // Update chat history
+          setInput(""); // Clear the input field
         })
         .catch((err) => console.error("Failed to send message:", err));
     }
