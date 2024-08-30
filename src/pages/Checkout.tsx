@@ -61,7 +61,7 @@ const Checkout: React.FC = () => {
         body: JSON.stringify({
           productRequest: cart,
           customerDTO: {
-            customerId: "1", // You may want to generate or get an actual customer ID here
+            customerId: "1", 
             customerName,
             customerEmail,
           },

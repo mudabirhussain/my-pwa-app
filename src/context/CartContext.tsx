@@ -42,9 +42,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         productQuantity: item.productQuantity,
       })),
       customerDTO: {
-        customerId: "1",  // Example customer ID, replace with actual data
-        customerName: "John Doe",  // Example name, replace with actual data
-        customerEmail: "john.doe@example.com",  // Example email, replace with actual data
+        customerId: "1",  
+        customerName: "John Doe",  
+        customerEmail: "john.doe@example.com",
       },
       currencyEnum: "USD",
       total: cart.reduce((acc, product) => acc + product.productQuantity * product.productPrice, 0),

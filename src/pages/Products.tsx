@@ -10,7 +10,6 @@ const Products: React.FC = () => {
   const fetchAllProductUrl = `${import.meta.env.VITE_RELIFE_BACKEND_URL}/products/all`;
   
   useEffect(() => {
-    // Fetch products from your backend
     fetch(fetchAllProductUrl)
       .then((res) => res.json())
       .then((data) => {

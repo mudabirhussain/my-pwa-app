@@ -58,7 +58,7 @@ const TranscriptionBox: React.FC = () => {
             ...prevHistory,
             data.text,
           ]);
-          setAudioChunks([]); // Clear chunks after processing
+          setAudioChunks([]);
           setIsProcessing(false);
         })
         .catch((err) => {

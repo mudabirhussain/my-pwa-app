@@ -19,7 +19,7 @@ const ImageGenerationBox: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        const imageUrl = data.data[0].url; // Assuming the API response is structured as you've shown
+        const imageUrl = data.data[0].url; 
         setHistory([{ prompt, imageUrl }, ...history]);
         setPrompt("");
         setIsLoading(false);
